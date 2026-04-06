@@ -1,0 +1,27 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment variables (never commit secrets)
+.env
+.env.*
+
+# ChromaDB data
+data/chroma/
+
+# Node / Next.js
+nextjs/node_modules/
+nextjs/.next/
+nextjs/out/
+nextjs/.env*
+
+# OS
+.DS_Store
+Thumbs.db
