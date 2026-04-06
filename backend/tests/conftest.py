@@ -3,6 +3,8 @@ Shared pytest fixtures for all phases.
 """
 
 import io
+from unittest.mock import MagicMock, patch
+
 import pytest
 import chromadb
 
@@ -17,6 +19,28 @@ def reset_chroma():
     ingestion_module._chroma_client = chromadb.EphemeralClient()
     yield
     ingestion_module._chroma_client = None
+
+
+# ── LLM mock (avoids real Gemini calls in unit tests) ─────────────────────── #
+
+@pytest.fixture
+def mock_llm():
+    """Patch ChatGoogleGenerativeAI so tests never hit the Gemini API."""
+    def _fake_invoke(messages):
+        prompt = messages[0].content if messages else ""
+        if "GDP of Mars" in prompt or "mars" in prompt.lower():
+            text = "I don't have enough information in the provided documents to answer this question."
+        else:
+            text = "The document discusses qualitative and quantitative methodology frameworks used in social science research."
+        resp = MagicMock()
+        resp.content = text
+        return resp
+
+    with patch("app.services.rag_chain.ChatGoogleGenerativeAI") as mock_cls:
+        instance = MagicMock()
+        instance.invoke.side_effect = _fake_invoke
+        mock_cls.return_value = instance
+        yield instance
 
 
 # ── Document fixtures ─────────────────────────────────────────────────────── #

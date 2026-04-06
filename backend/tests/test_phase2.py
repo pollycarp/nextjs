@@ -104,7 +104,7 @@ async def test_retrieval_score_threshold(client, sample_txt_bytes):
 
 
 @pytest.mark.asyncio
-async def test_rag_answer_not_empty(client, sample_txt_bytes):
+async def test_rag_answer_not_empty(client, sample_txt_bytes, mock_llm):
     await _upload(client, sample_txt_bytes, "sample.txt", "text/plain")
 
     resp = await client.post(
@@ -120,7 +120,7 @@ async def test_rag_answer_not_empty(client, sample_txt_bytes):
 
 
 @pytest.mark.asyncio
-async def test_rag_sources_attached(client, sample_txt_bytes):
+async def test_rag_sources_attached(client, sample_txt_bytes, mock_llm):
     await _upload(client, sample_txt_bytes, "sample.txt", "text/plain")
 
     resp = await client.post(
@@ -137,7 +137,7 @@ async def test_rag_sources_attached(client, sample_txt_bytes):
 
 
 @pytest.mark.asyncio
-async def test_rag_hallucination_guard(client, sample_txt_bytes):
+async def test_rag_hallucination_guard(client, sample_txt_bytes, mock_llm):
     await _upload(client, sample_txt_bytes, "sample.txt", "text/plain")
 
     resp = await client.post(
