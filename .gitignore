@@ -14,7 +14,8 @@ build/
 .env.*
 
 # ChromaDB data
-data/chroma/
+data/
+backend/data/
 
 # Node / Next.js
 nextjs/node_modules/
