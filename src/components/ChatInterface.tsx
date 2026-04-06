@@ -10,8 +10,9 @@ interface Message {
   timestamp: Date;
   sources?: Array<{
     title: string;
-    url: string;
-    snippet: string;
+    url?: string;
+    excerpt: string;
+    page?: string;
   }>;
 }
 
@@ -78,9 +79,14 @@ export default function ChatInterface() {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.result,
+        content: data.answer,
         timestamp: new Date(),
-        sources: data.sources?.slice(0, 3), // Show top 3 sources
+        sources: data.sources?.slice(0, 3).map((s: any) => ({
+          title: s.title,
+          excerpt: s.excerpt || '',
+          url: s.url,
+          page: s.page,
+        })),
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -179,8 +185,8 @@ export default function ChatInterface() {
                   <div className="space-y-2">
                     {message.sources.map((source, index) => (
                       <div key={index} className="text-xs bg-white/30 p-2 rounded">
-                        <div className="font-medium truncate">{source.title}</div>
-                        <div className="text-gray-600 truncate">{source.snippet}</div>
+                        <div className="font-medium truncate">{source.title}{source.page ? ` (p. ${source.page})` : ''}</div>
+                        <div className="text-gray-600 truncate">{source.excerpt}</div>
                       </div>
                     ))}
                   </div>

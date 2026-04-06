@@ -105,31 +105,45 @@ export default function ResearchDashboard() {
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
+    const newDocs: Document[] = [];
 
-    // Simulate upload and processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    for (const file of Array.from(files)) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
 
-    const newDocs: Document[] = Array.from(files).map((file, index) => ({
-      id: Date.now().toString() + index,
-      name: file.name,
-      type: file.name.endsWith('.pdf') ? 'pdf' :
-             file.name.includes('arxiv') ? 'arxiv' : 'note',
-      size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
-      uploadedAt: new Date().toISOString().split('T')[0],
-      status: 'processing',
-    }));
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({ detail: response.statusText }));
+          console.error(`Upload failed for ${file.name}:`, err.detail);
+          continue;
+        }
+
+        const data = await response.json();
+        newDocs.push({
+          id: data.doc_id,
+          name: data.filename,
+          type: file.name.endsWith('.pdf') ? 'pdf' :
+                file.name.includes('arxiv') ? 'arxiv' : 'note',
+          size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
+          uploadedAt: new Date().toISOString().split('T')[0],
+          status: 'processed',
+        });
+      } catch (err) {
+        console.error(`Upload error for ${file.name}:`, err);
+      }
+    }
 
     setDocuments(prev => [...newDocs, ...prev]);
     setIsUploading(false);
 
-    // Simulate processing completion
-    setTimeout(() => {
-      setDocuments(prev => prev.map(doc =>
-        newDocs.find(nd => nd.id === doc.id)
-          ? { ...doc, status: 'processed' }
-          : doc
-      ));
-    }, 3000);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleCreateProject = () => {
