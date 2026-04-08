@@ -1,4 +1,8 @@
+import asyncio
+import json
+
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional
 
@@ -164,12 +168,90 @@ async def research(request: ResearchRequest):
             agent_used="graph_rag",
         )
 
-    # Phase 4+ stubs
+    if request.research_type == "deep_research":
+        from app.agents.orchestrator import run_pipeline_async
+
+        try:
+            state = await run_pipeline_async(request.query)
+        except Exception as exc:
+            return ResearchResponse(
+                answer=f"Pipeline error: {exc}",
+                sources=[],
+                research_type=request.research_type,
+                agent_used="pipeline_error",
+            )
+        sources = [
+            Source(
+                title=s["title"],
+                excerpt=s["excerpt"],
+                page=s.get("page"),
+                score=s.get("score"),
+                source_type=s.get("source_type", "internal"),
+            )
+            for s in state["sources"]
+        ]
+        return ResearchResponse(
+            answer=state["final_report"],
+            sources=sources,
+            research_type=request.research_type,
+            agent_used="multi_agent",
+        )
+
+    # Phase 5+ stubs
     return ResearchResponse(
-        answer=(
-            f"[Phase 4 pending] '{request.research_type}' research for: '{request.query}'."
-        ),
+        answer=f"[Phase 5 pending] '{request.research_type}' research for: '{request.query}'.",
         sources=[],
         research_type=request.research_type,
         agent_used="stub",
     )
+
+
+@router.post("/research/stream")
+async def research_stream(request: ResearchRequest):
+    """SSE streaming endpoint — emits agent status events then the final result."""
+
+    async def _generate():
+        from app.agents.researcher import run_researcher
+        from app.agents.critic import run_critic
+        from app.agents.writer import run_writer
+        from app.agents.orchestrator import MAX_REVISIONS
+
+        def _sse(data: dict) -> str:
+            return f"data: {json.dumps(data)}\n\n"
+
+        yield _sse({"event": "agent_status", "agent": "researcher", "status": "working"})
+        res = await asyncio.to_thread(run_researcher, request.query)
+        research_output, sources = res["research_output"], res["sources"]
+        yield _sse({"event": "agent_status", "agent": "researcher", "status": "done"})
+
+        revision_count = 0
+        critique_output = ""
+        flagged_claims: list = []
+
+        while True:
+            yield _sse({"event": "agent_status", "agent": "critic", "status": "working"})
+            crit = await asyncio.to_thread(run_critic, research_output)
+            critique_output = crit["critique_output"]
+            flagged_claims = crit["flagged_claims"]
+            yield _sse({"event": "agent_status", "agent": "critic", "status": "done"})
+
+            if len(flagged_claims) > 2 and revision_count < MAX_REVISIONS:
+                yield _sse({"event": "agent_status", "agent": "researcher", "status": "revising"})
+                revised = await asyncio.to_thread(
+                    run_researcher,
+                    f"{request.query}\n\nAddress critique:\n{critique_output}",
+                )
+                research_output, sources = revised["research_output"], revised["sources"]
+                revision_count += 1
+                yield _sse({"event": "agent_status", "agent": "researcher", "status": "revised"})
+            else:
+                break
+
+        yield _sse({"event": "agent_status", "agent": "writer", "status": "working"})
+        wr = await asyncio.to_thread(run_writer, request.query, research_output, critique_output, sources)
+        yield _sse({"event": "agent_status", "agent": "writer", "status": "done"})
+
+        yield _sse({"event": "result", "answer": wr["final_report"], "sources": sources, "flagged_claims": flagged_claims})
+        yield _sse({"event": "done"})
+
+    return StreamingResponse(_generate(), media_type="text/event-stream")
