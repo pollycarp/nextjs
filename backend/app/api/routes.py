@@ -105,11 +105,69 @@ async def research(request: ResearchRequest):
             agent_used="rag_chain",
         )
 
-    # Stubs for Phase 3 research types (comprehensive, literature_review)
+    if request.research_type == "comprehensive":
+        from app.services.crag import run_crag
+
+        try:
+            result = await run_crag(request.query)
+        except Exception as exc:
+            return ResearchResponse(
+                answer=f"CRAG error: {exc}",
+                sources=[],
+                research_type=request.research_type,
+                agent_used="crag_error",
+            )
+        sources = [
+            Source(
+                title=s["title"],
+                excerpt=s["excerpt"],
+                url=s.get("url"),
+                page=s.get("page"),
+                score=s.get("score"),
+                source_type=s.get("source_type", "internal"),
+            )
+            for s in result["sources"]
+        ]
+        return ResearchResponse(
+            answer=result["answer"],
+            sources=sources,
+            research_type=request.research_type,
+            agent_used="crag",
+        )
+
+    if request.research_type == "literature_review":
+        from app.services.graph_rag import run_graph_rag
+
+        try:
+            result = await run_graph_rag(request.query)
+        except Exception as exc:
+            return ResearchResponse(
+                answer=f"GraphRAG error: {exc}",
+                sources=[],
+                research_type=request.research_type,
+                agent_used="graph_rag_error",
+            )
+        sources = [
+            Source(
+                title=s["title"],
+                excerpt=s["excerpt"],
+                page=s.get("page"),
+                score=s.get("score"),
+                source_type=s.get("source_type", "internal"),
+            )
+            for s in result["sources"]
+        ]
+        return ResearchResponse(
+            answer=result["answer"],
+            sources=sources,
+            research_type=request.research_type,
+            agent_used="graph_rag",
+        )
+
+    # Phase 4+ stubs
     return ResearchResponse(
         answer=(
-            f"[Phase 3 pending] '{request.research_type}' research for: '{request.query}'. "
-            "CRAG and GraphRAG pipelines will be wired up in Phase 3."
+            f"[Phase 4 pending] '{request.research_type}' research for: '{request.query}'."
         ),
         sources=[],
         research_type=request.research_type,
