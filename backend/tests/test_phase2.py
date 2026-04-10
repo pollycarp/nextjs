@@ -91,11 +91,12 @@ async def test_retrieval_returns_relevant_chunks(client, sample_txt_bytes):
 
 @pytest.mark.asyncio
 async def test_retrieval_score_threshold(client, sample_txt_bytes):
-    await _upload(client, sample_txt_bytes, "sample.txt", "text/plain")
+    resp = await _upload(client, sample_txt_bytes, "sample.txt", "text/plain")
+    doc_id = resp.json()["doc_id"]
 
     from app.services.retrieval import retrieve_chunks
 
-    chunks = retrieve_chunks("methodology research approaches")
+    chunks = retrieve_chunks("methodology research approaches", doc_id=doc_id)
     assert len(chunks) > 0
     for chunk in chunks:
         assert chunk["score"] > 0.5, (
