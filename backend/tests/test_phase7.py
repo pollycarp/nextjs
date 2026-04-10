@@ -95,7 +95,17 @@ async def test_tokens_tracked(client, sample_txt_bytes):
 
 # ── 4. Docker build ────────────────────────────────────────────────────────── #
 
-@pytest.mark.skipif(shutil.which("docker") is None, reason="Docker not installed")
+def _docker_daemon_running() -> bool:
+    """Return True only if docker is installed AND the daemon is reachable."""
+    if shutil.which("docker") is None:
+        return False
+    result = subprocess.run(
+        ["docker", "info"], capture_output=True, timeout=10
+    )
+    return result.returncode == 0
+
+
+@pytest.mark.skipif(not _docker_daemon_running(), reason="Docker daemon not running")
 def test_docker_build_succeeds():
     """docker build exits 0."""
     result = subprocess.run(
@@ -128,11 +138,12 @@ def test_langsmith_trace_created():
 def test_frontend_build_succeeds():
     """npm run build exits 0."""
     result = subprocess.run(
-        ["npm", "run", "build"],
+        "npm run build",
         cwd=str(NEXTJS_DIR),
         capture_output=True,
         text=True,
         timeout=300,
+        shell=True,  # required on Windows for npm.cmd
     )
     assert result.returncode == 0, f"Frontend build failed:\n{result.stdout[-2000:]}\n{result.stderr[-1000:]}"
 
@@ -146,10 +157,11 @@ def test_frontend_build_succeeds():
 def test_eslint_passes():
     """npm run lint exits 0."""
     result = subprocess.run(
-        ["npm", "run", "lint"],
+        "npm run lint",
         cwd=str(NEXTJS_DIR),
         capture_output=True,
         text=True,
         timeout=120,
+        shell=True,  # required on Windows for npm.cmd
     )
     assert result.returncode == 0, f"ESLint failed:\n{result.stdout}\n{result.stderr}"
