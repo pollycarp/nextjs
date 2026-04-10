@@ -112,7 +112,8 @@ def test_docker_build_succeeds():
         ["docker", "build", "-t", "research-assistant-test", "."],
         cwd=str(BACKEND_DIR),
         capture_output=True,
-        text=True,
+        encoding="utf-8",
+        errors="replace",
         timeout=300,
     )
     assert result.returncode == 0, f"Docker build failed:\n{result.stderr}"

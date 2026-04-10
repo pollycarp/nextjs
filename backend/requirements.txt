@@ -11,7 +11,6 @@ langchain-community==0.3.0
 
 # LlamaIndex
 llama-index==0.11.0
-llama-index-vector-stores-chroma>=0.4.0
 
 # Vector store
 chromadb>=1.0.0
