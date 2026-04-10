@@ -135,10 +135,14 @@ def test_langsmith_trace_created():
 
 # ── 6. Frontend build ──────────────────────────────────────────────────────── #
 
-@pytest.mark.skipif(
-    not NEXTJS_DIR.exists() or shutil.which("npm") is None,
-    reason="nextjs directory or npm not available",
+_FRONTEND_READY = (
+    NEXTJS_DIR.exists()
+    and shutil.which("npm") is not None
+    and (NEXTJS_DIR / "node_modules").exists()
 )
+
+
+@pytest.mark.skipif(not _FRONTEND_READY, reason="nextjs node_modules not installed")
 def test_frontend_build_succeeds():
     """npm run build exits 0."""
     result = subprocess.run(
@@ -154,10 +158,7 @@ def test_frontend_build_succeeds():
 
 # ── 7. ESLint ──────────────────────────────────────────────────────────────── #
 
-@pytest.mark.skipif(
-    not NEXTJS_DIR.exists() or shutil.which("npm") is None,
-    reason="nextjs directory or npm not available",
-)
+@pytest.mark.skipif(not _FRONTEND_READY, reason="nextjs node_modules not installed")
 def test_eslint_passes():
     """npm run lint exits 0."""
     result = subprocess.run(
