@@ -67,8 +67,10 @@ async def test_embedding_stored(client, sample_txt_bytes):
     doc_id = resp.json()["doc_id"]
 
     # Verify embeddings are in ChromaDB under the returned doc_id
-    collection = get_collection()
-    query_embedding = embed_texts(["methodology"])[0]
+    # Access embed_texts via module so the autouse mock is applied
+    import app.services.ingestion as _ing
+    collection = _ing.get_collection()
+    query_embedding = _ing.embed_texts(["methodology"])[0]
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=1,

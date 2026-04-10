@@ -45,6 +45,27 @@ def reset_chroma():
     ingestion_module._chroma_client = None
 
 
+# ── Embedding mock (avoids real Gemini API calls in all tests) ────────────── #
+
+@pytest.fixture(autouse=True)
+def mock_embed_texts():
+    """
+    Replace embed_texts with a deterministic fake so no GOOGLE_API_KEY is
+    needed in CI.  All texts get the same 8-dim unit vector; cosine similarity
+    between any two is 1.0 (score = 1.0), which satisfies the >0.5 threshold.
+    """
+    _DIM = 8
+    _VEC = [1.0] + [0.0] * (_DIM - 1)  # unit vector along first axis
+
+    def _fake(texts: list[str]) -> list[list[float]]:
+        return [_VEC for _ in texts]
+
+    with patch("app.services.ingestion.embed_texts", side_effect=_fake), \
+         patch("app.services.retrieval.embed_texts", side_effect=_fake), \
+         patch("app.services.rag_chain.embed_texts", side_effect=_fake):
+        yield
+
+
 # ── LLM mock (avoids real Gemini calls in unit tests) ─────────────────────── #
 
 @pytest.fixture
