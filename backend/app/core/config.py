@@ -11,6 +11,7 @@ class Settings:
     PINECONE_API_KEY: str = os.getenv("PINECONE_API_KEY", "")
     PINECONE_INDEX_NAME: str = os.getenv("PINECONE_INDEX_NAME", "research-assistant")
     TAVILY_API_KEY: str = os.getenv("TAVILY_API_KEY", "")
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "dev-secret-change-in-production")
 
     # CORS: origins allowed to talk to the backend
     ALLOWED_ORIGINS: list[str] = [

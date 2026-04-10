@@ -11,6 +11,30 @@ import chromadb
 import app.services.ingestion as ingestion_module
 
 
+# ── SQLite DB isolation ───────────────────────────────────────────────────── #
+
+@pytest.fixture(autouse=True)
+def reset_db(tmp_path):
+    """Give every test its own empty SQLite DB."""
+    import app.core.database as db_module
+    original = db_module.DB_PATH
+    db_module.DB_PATH = str(tmp_path / "test.db")
+    db_module.init_db()
+    yield str(tmp_path / "test.db")
+    db_module.DB_PATH = original
+
+
+# ── Rate limiter isolation ─────────────────────────────────────────────────── #
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    """Reset rate limiter state between tests."""
+    from app.core.rate_limiter import reset
+    reset()
+    yield
+    reset()
+
+
 # ── ChromaDB isolation ────────────────────────────────────────────────────── #
 
 @pytest.fixture(autouse=True)
