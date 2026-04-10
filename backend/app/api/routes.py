@@ -1,10 +1,12 @@
 import asyncio
 import json
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional
+
+from app.core.auth import get_optional_user
 
 router = APIRouter()
 
@@ -46,8 +48,16 @@ class UploadResponse(BaseModel):
 
 # ── Endpoints ─────────────────────────────────────────────────────────────── #
 
+@router.get("/documents")
+async def list_documents(user_id: Optional[str] = Depends(get_optional_user)):
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    import app.core.database as db
+    return await asyncio.to_thread(db.get_documents, user_id)
+
+
 @router.post("/upload", response_model=UploadResponse)
-async def upload(file: UploadFile = File(...)):
+async def upload(file: UploadFile = File(...), user_id: Optional[str] = Depends(get_optional_user)):
     """Ingest a PDF/DOCX/TXT into ChromaDB."""
     filename = file.filename or ""
     ext = "." + filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
@@ -67,6 +77,13 @@ async def upload(file: UploadFile = File(...)):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Ingestion failed: {exc}")
 
+    if user_id:
+        import app.core.database as db
+        await asyncio.to_thread(
+            db.save_document, user_id, result["doc_id"], result["filename"],
+            result.get("chunk_count", 0), result.get("page_count", 0), result["status"],
+        )
+
     return UploadResponse(
         doc_id=result["doc_id"],
         filename=result["filename"],
@@ -78,8 +95,11 @@ async def upload(file: UploadFile = File(...)):
 
 
 @router.post("/research", response_model=ResearchResponse)
-async def research(request: ResearchRequest):
-    """Run a research query. quick_search → real RAG chain; others → Phase 3 stubs."""
+async def research(request: ResearchRequest, user_id: Optional[str] = Depends(get_optional_user)):
+    """Run a research query across all pipeline types."""
+    if user_id:
+        import app.core.database as db
+        await asyncio.to_thread(db.log_search, user_id, request.query, request.research_type or "")
     if request.research_type == "quick_search":
         from app.services.rag_chain import run_rag_chain
 
