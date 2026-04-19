@@ -31,7 +31,7 @@ Answer:"""
 def grade_relevance(query: str, chunk_text: str) -> str:
     """Grade a single chunk as 'yes', 'no', or 'partial'."""
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0,
     )
@@ -104,7 +104,7 @@ def _run_crag_sync(query: str) -> dict:
         sources = web_results
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0,
     )

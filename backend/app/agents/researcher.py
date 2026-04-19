@@ -38,7 +38,7 @@ def run_researcher(query: str) -> dict:
     )
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0.3,
     )

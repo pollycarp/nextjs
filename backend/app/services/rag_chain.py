@@ -3,11 +3,10 @@ RAG chain — Phase 2.
 
 Uses LangChain LCEL + ChromaDB + Google Gemini (free tier).
 - Embeddings: gemini-embedding-001 (via google-genai SDK directly)
-- LLM: gemini-1.5-flash
+- LLM: gemini-2.0-flash-lite
 """
 
 import asyncio
-import time
 
 from langchain_chroma import Chroma
 from langchain_core.embeddings import Embeddings
@@ -55,21 +54,18 @@ def _run_sync(query: str) -> dict:
     )
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0,
     )
 
     prompt = _RAG_PROMPT.format(context=context, question=query)
-    for attempt in range(3):
-        try:
-            response = llm.invoke([HumanMessage(content=prompt)])
-            break
-        except Exception as e:
-            if attempt < 2 and any(kw in str(e).lower() for kw in ("429", "exhausted", "quota")):
-                time.sleep(15 * (attempt + 1))
-            else:
-                raise
+    try:
+        response = llm.invoke([HumanMessage(content=prompt)])
+    except Exception as e:
+        if any(kw in str(e).lower() for kw in ("429", "exhausted", "quota")):
+            raise Exception("Gemini API rate limit reached. Please wait a moment and try again.")
+        raise
     answer: str = response.content  # type: ignore[assignment]
 
     sources = [

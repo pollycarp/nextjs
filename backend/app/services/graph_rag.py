@@ -76,7 +76,7 @@ def _parse_json_response(content: str) -> list:
 def extract_entities(text: str) -> list[dict]:
     """Extract (entity, type) dicts from text using Gemini."""
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0,
     )
@@ -90,7 +90,7 @@ def extract_entities(text: str) -> list[dict]:
 def extract_relations(text: str) -> list[dict]:
     """Extract (subject, relation, object) triples from text using Gemini."""
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0,
     )
@@ -141,7 +141,7 @@ def _run_graph_rag_sync(query: str) -> dict:
     ) + graph_context
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0,
     )
