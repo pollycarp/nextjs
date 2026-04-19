@@ -1,28 +1,58 @@
-# Python
-venv/
+# ── Python ────────────────────────────────────────────────────────────────── #
+backend/venv/
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 .pytest_cache/
 *.egg-info/
 dist/
 build/
 .eggs/
+*.egg
+.mypy_cache/
+.ruff_cache/
 
-# Environment variables (never commit secrets)
+# ── Environment variables (never commit secrets) ──────────────────────────── #
 .env
 .env.*
+!.env.example
 
-# ChromaDB data
+# ── ChromaDB / vector store data ─────────────────────────────────────────── #
 data/
 backend/data/
 
-# Node / Next.js
-nextjs/node_modules/
-nextjs/.next/
-nextjs/out/
-nextjs/.env*
+# ── Node / Next.js ───────────────────────────────────────────────────────── #
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
 
-# OS
+# ── Package manager locks (keep one, ignore the others if not using them) ─── #
+# Uncomment whichever you are NOT using:
+# yarn.lock
+# pnpm-lock.yaml
+
+# ── OS ───────────────────────────────────────────────────────────────────── #
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# ── IDE / editor ─────────────────────────────────────────────────────────── #
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Logs ─────────────────────────────────────────────────────────────────── #
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Coverage / test artifacts ─────────────────────────────────────────────── #
+coverage/
+.coverage
+htmlcov/

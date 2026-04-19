@@ -27,7 +27,7 @@ export default function ChatInterface() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [researchType, setResearchType] = useState<'quick' | 'comprehensive' | 'literature'>('quick');
+  const [researchType, setResearchType] = useState<'quick_search' | 'comprehensive' | 'literature_review'>('quick_search');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -128,9 +128,9 @@ export default function ChatInterface() {
               onChange={(e) => setResearchType(e.target.value as any)}
               className="bg-white/20 border border-white/30 rounded-lg px-3 py-1 text-sm focus:outline-none"
             >
-              <option value="quick">Quick Search</option>
+              <option value="quick_search">Quick Search</option>
               <option value="comprehensive">Comprehensive</option>
-              <option value="literature">Literature Review</option>
+              <option value="literature_review">Literature Review</option>
             </select>
             <div className="flex gap-2">
               <button

@@ -87,7 +87,7 @@ async def ingest_document(file_bytes: bytes, filename: str) -> dict:
             "status": "empty",
         }
 
-    texts = [node.get_content() for node in nodes]
+    texts = [node.text for node in nodes]
     embeddings = embed_texts(texts)
 
     collection = get_collection()
