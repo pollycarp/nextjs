@@ -42,14 +42,11 @@ def get_collection() -> chromadb.Collection:
 def embed_texts(texts: list[str]) -> list[list[float]]:
     from google import genai
     client = genai.Client(api_key=settings.GOOGLE_API_KEY)
-    embeddings = []
-    for text in texts:
-        result = client.models.embed_content(
-            model="models/gemini-embedding-001",
-            contents=text,
-        )
-        embeddings.append(list(result.embeddings[0].values))
-    return embeddings
+    result = client.models.embed_content(
+        model="models/gemini-embedding-001",
+        contents=texts,
+    )
+    return [list(e.values) for e in result.embeddings]
 
 
 # ── Ingestion ─────────────────────────────────────────────────────────────── #

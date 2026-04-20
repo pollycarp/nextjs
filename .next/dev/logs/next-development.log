@@ -1,25 +1,12 @@
-[00:00:20.619] Server  LOG     ✓ Ready in 19.9s
-[00:16:23.877] Server  LOG     ○ Compiling / ...
-[00:16:27.199] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:16:43.393] Server  ERROR   (node:20672) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+[00:00:11.439] Server  LOG     ✓ Ready in 9.9s
+[00:00:26.133] Server  LOG     ○ Compiling / ...
+[00:00:30.606] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:00.451] Server  ERROR   (node:46748) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[00:16:43.678] Browser ERROR   Error: {}
-[00:20:18.782] Server  LOG     ✓ Compiled in 179ms
-[00:20:25.869] Server  LOG     ✓ Compiled in 155ms
-[00:21:44.759] Browser ERROR   Error: {}
-[00:21:54.611] Browser ERROR   Error: {}
-[00:23:53.305] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:24:02.872] Browser ERROR   Error: {}
-[00:40:59.811] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:41:05.069] Browser ERROR   Error: {}
-[00:42:47.248] Browser ERROR   Error: {}
-[00:42:52.038] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:42:55.256] Browser ERROR   Error: {}
-[01:07:15.874] Browser ERROR   Error: {}
-[01:07:27.478] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:07:33.335] Browser ERROR   Error: {}
-[01:16:35.579] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:19:17.518] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[01:19:55.510] Server  ERROR   Failed to proxy http://localhost:8000/api/research Error: socket hang up
-[01:19:55.513] Server  ERROR   Error: socket hang up
-[01:19:56.532] Browser ERROR   Error: {}
+[00:01:30.511] Server  ERROR   Failed to proxy http://localhost:8000/api/upload Error: socket hang up
+[00:01:30.518] Server  ERROR   Error: socket hang up
+[00:01:31.537] Browser ERROR   Upload failed for Polycarp_Interview_Prep_NaCl.docx: Internal Server Error
+[00:02:38.108] Server  ERROR   Failed to proxy http://localhost:8000/api/upload Error: socket hang up
+[00:02:38.115] Server  ERROR   Error: socket hang up
+[00:02:39.210] Browser ERROR   Upload failed for Polycarp_Interview_Prep_NaCl.docx: Internal Server Error
+[00:05:45.865] Server  LOG     ✓ Compiled in 2.7s

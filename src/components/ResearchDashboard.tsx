@@ -240,7 +240,7 @@ export default function ResearchDashboard() {
                 onChange={handleFileUpload}
                 className="hidden"
                 multiple
-                accept=".pdf,.txt,.md,.doc,.docx"
+                accept=".pdf,.txt,.docx"
               />
               <button
                 onClick={handleCreateProject}

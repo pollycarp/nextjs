@@ -1065,7 +1065,7 @@ function ResearchDashboard() {
                                             onChange: handleFileUpload,
                                             className: "hidden",
                                             multiple: true,
-                                            accept: ".pdf,.txt,.md,.doc,.docx"
+                                            accept: ".pdf,.txt,.docx"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ResearchDashboard.tsx",
                                             lineNumber: 236,
